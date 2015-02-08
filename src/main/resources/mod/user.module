@@ -1,0 +1,84 @@
+// USER
+
+@_user : User (Record)
+
+
+#construct:
+	var user_name = '...'
+
+
+
+#setup:
+	<< 'New user created.' >>
+
+	< '<h3>First, some basic information.</h3>' >
+	!--
+	[ '<em>Enter desired user name:</em>' | input(user_name) ]
+	--!
+	
+	< '<h3>Now, tell us some things about you.</h3>' >
+	!--
+	[ '<em>Name:</em>' | input(name) ]
+	[ '<em>Phone:</em>' | input(phone) ]
+	[ '<em>E-mail:</em>' | input(email) ]
+	[ '<em>Birthday:</em>' | input(birthday) ]
+	--!
+
+	< '<h3>Are there any additional notes?</h3>' >
+	[ input(notes) ]
+
+
+
+
+#identity:
+	<< user_name >>
+	
+	< '<h3>User information:</h3>' >
+	!--
+	[ '<em>Name:</em>' | focus(name) ]
+	[ '<em>Phone:</em>' | focus(phone) ]
+	[ '<em>E-mail:</em>' | focus(email) ]
+	[ '<em>Birthday:</em>' | focus(birthday) ]
+	[ '<field-monitor uuid='super_user' field='name'></field-monitor>' ]
+	--!
+
+	< '<h3>Groups:</h3>' >
+	!--
+	[ array(pvt:_member_of,noedit) ]
+	--!
+
+	< '<h3>Tags:</h3>' >
+	!--
+	[ array(tags) ]
+	--!
+
+	< '<h3>Notes:</h3>' >
+	!--
+	[ focus(notes) ]
+	--!
+
+
+
+#settings:
+	<< user_name >>
+
+	< '<h3>Update and Messaging Settings:</h3>' >
+	!--
+	[ check(daily_email, 'Get a daily email overview') ]
+	[ check(sms_updates, 'Send SMS updates') ]
+	[ check(email_updates, 'Send email updates') ]
+	--!
+
+	< '<h3>Update and Messaging Settings:</h3>' >
+	!--
+	[ check(session_alive, 'Keep sessions alive') ]
+	[ '<em>Session timeout (in seconds):</em>' | focus(session_timeout) ]
+	[ '<div id="sessions"></div>' ]
+	--!
+
+	< '<h3>PIN and Password Settings:</h3>' >
+	!--
+	[ check(daily_email, 'Allow PIN access to confirmed ') ]
+	[ check(sms_updates, 'Send SMS updates') ]
+	[ check(email_updates, 'Send email updates') ]
+	--!
