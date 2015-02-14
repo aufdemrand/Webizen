@@ -55,7 +55,6 @@ class Document {
 
     public void getAttachmentsFrom(HttpServletRequest request) {
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-
         if (isMultipart) {
             println('multipart' + request)
             FileItemFactory factory = new DiskFileItemFactory();
@@ -71,6 +70,8 @@ class Document {
                         def name = FilenameUtils.getName(i.getName())
                         def type = i.getContentType() != null ? i.getContentType() : 'application/download';
                         _attachments[name] = ['content_type': type, 'data': data]
+                        // Add time uploaded to dates[:]
+                        dates[name] = System.currentTimeMillis()
                     } catch (Exception e) { println(i) }
                 }
                 print(_attachments)
@@ -80,7 +81,6 @@ class Document {
                 e.printStackTrace();
             }
         }
-
     }
 
     // Saves any changes to the Database
