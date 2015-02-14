@@ -84,6 +84,9 @@ abstract class Script {
     // A small description of what the script does
     def description
 
+    // Used in sorting similar scripts
+    def group
+
     // The 'type' of script, used to indicate which Class of Script to use during loading
     def type
 

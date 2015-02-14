@@ -10,7 +10,7 @@ class Webizen {
     public static main(String[] args) throws Exception {
 
         // Initialize the Database
-        new CouchHandler('http://68.70.176.226:5984/');
+        new CouchHandler('http://192.168.254.205:5984/');
 
         // Initialize Scripts
         Script.reloadAll();
