@@ -1,13 +1,12 @@
 package net.aufdemrand.webizen.scripts
 
+import net.aufdemrand.webizen.includes.Include
 import org.apache.commons.lang.StringUtils
 
 /**
  * Created by denizen_ on 1/16/15.
  */
 class Preprocessor {
-
-
 
     public static String process(String content) {
 

@@ -1,5 +1,6 @@
 package net.aufdemrand.webizen.database
 
+import net.aufdemrand.webizen.web.RequestCreator
 import org.apache.commons.io.IOUtils
 import org.apache.http.HttpEntity
 import org.apache.http.client.methods.CloseableHttpResponse
@@ -48,27 +49,7 @@ class CouchHandler {
      */
     public <T> T getDoc(String id, String database, Class type)  {
 
-        // URL to fetch information from CouchDB
-        def url = URIUtil.encodePath(address + database + '/' + id)
-
-        // Client for making HTTP GET requests
-        CloseableHttpClient httpClient = HttpClients.createDefault()
-        HttpGet httpGet = new HttpGet(url)
-        CloseableHttpResponse response = null
-
-        // Returned string
-        def returned
-
-        // Execute request
-        try {
-            response = httpClient.execute(httpGet)
-            HttpEntity entity = response.getEntity()
-            returned = IOUtils.toString(entity.getContent())
-            EntityUtils.consume(entity)
-            print('GET [' + response.getStatusLine().statusCode + '] -> ' + returned)
-        } catch (Exception e) { return null } finally {
-            if (response != null) try { response.close() } catch (IOException e) { e.printStackTrace() }
-        }
+        def returned = RequestCreator.get(address + database + '/' + id)
 
         // ObjectMapper for Jackson Deserialization
         ObjectMapper objectMapper = new ObjectMapper()
