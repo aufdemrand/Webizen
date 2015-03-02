@@ -4,6 +4,7 @@ import org.eclipse.jetty.server.handler.ContextHandler
 import org.eclipse.jetty.server.session.HashSessionIdManager
 import org.eclipse.jetty.server.session.HashSessionManager
 import org.eclipse.jetty.server.session.SessionHandler
+import org.eclipse.jetty.websocket.WebSocketHandler
 
 /**
  * Created by Jeremy on 1/15/2015.
@@ -27,27 +28,39 @@ class Server implements Runnable {
         // Create a server object.
         //
 
-        org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server(http_port);
+        org.eclipse.jetty.server.Server server =
+                new org.eclipse.jetty.server.Server(http_port)
 
         // Specify the Session ID Manager
-        HashSessionIdManager id_manager = new HashSessionIdManager();
-        server.setSessionIdManager(id_manager);
-        ContextHandler context = new ContextHandler("/");
-        server.setHandler(context);
-        HashSessionManager manager = new HashSessionManager();
-        SessionHandler sessions = new SessionHandler(manager);
-        context.setHandler(sessions);
+        HashSessionIdManager id_manager = new HashSessionIdManager()
+        server.setSessionIdManager(id_manager)
+        ContextHandler context = new ContextHandler("/")
+        server.setHandler(context)
+        HashSessionManager manager = new HashSessionManager()
+        SessionHandler sessions = new SessionHandler(manager)
+        context.setHandler(sessions)
 
         // Hello, World!
-        RequestHandler handler = new RequestHandler();
-        sessions.setHandler(handler);
+        RequestHandler handler = new RequestHandler()
+        sessions.setHandler(handler)
+
+
+        WebSocketHandler wsHandler = new WebSocketHandler() {
+             @Override
+            public void configure(WebSocketServlet factory) {
+                factory.register(MyWebSocketHandler.class);
+            }
+        };
+        server.setHandler(wsHandler);
+
+
 
         // Start the server!
         try {
-            server.start();
-            server.join();
+            server.start()
+            server.join()
         } catch (Exception e) {
-            e.printStackTrace();
+            e.printStackTrace()
         }
     }
 
