@@ -11,6 +11,7 @@ import org.apache.commons.io.FilenameUtils
 import org.codehaus.jackson.map.ObjectMapper
 
 import javax.servlet.http.HttpServletRequest
+import javax.xml.bind.DatatypeConverter
 
 
 class Document {
@@ -66,13 +67,13 @@ class Document {
                         if (i.getName() == null)
                             continue;
                         println(i.getFieldName() + ' -> ' + i.getName())
-                        def data = Base64.getEncoder().encodeToString(i.get())
+                        def data =  DatatypeConverter.printBase64Binary(i.get())
                         def name = FilenameUtils.getName(i.getName())
                         def type = i.getContentType() != null ? i.getContentType() : 'application/download';
                         _attachments[name] = ['content_type': type, 'data': data]
                         // Add time uploaded to dates[:]
                         dates[name] = System.currentTimeMillis()
-                    } catch (Exception e) { println(i) }
+                    } catch (Exception e) { println(i); e.printStackTrace() }
                 }
                 print(_attachments)
             } catch (FileUploadException e) {

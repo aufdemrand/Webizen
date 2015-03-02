@@ -1,17 +1,9 @@
 package net.aufdemrand.webizen.web
 
 import net.aufdemrand.webizen.hooks.Hooks
-import org.apache.commons.codec.binary.StringUtils
-import org.apache.commons.fileupload.FileItem
-import org.apache.commons.fileupload.FileItemFactory
-import org.apache.commons.fileupload.FileUploadException
-import org.apache.commons.fileupload.disk.DiskFileItemFactory
-import org.apache.commons.fileupload.servlet.ServletFileUpload
-import org.apache.tools.ant.taskdefs.condition.Http
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
 
-import javax.servlet.ServletContext
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -37,14 +29,6 @@ class RequestHandler extends AbstractHandler {
         // them itself.
 
         try {
-//                println("\n\n\nNEW Request { \nHost: " + request.getRemoteHost());
-//                println("Target: " + target);
-//                println("Method: " + request.getMethod());
-//                println("Query: " + request.getQueryString());
-//                println("Session: " + request.getSession().getId());
-//                println("Host: " + request.getRemoteHost());
-//                println("Content: " + content.toString());
-//                println("}\n");
 
             // Disable page caching by default
             response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
@@ -57,7 +41,6 @@ class RequestHandler extends AbstractHandler {
             response.addHeader("Access-Control-Allow-Methods", "GET, PUT, POST, OPTIONS, DELETE");
             response.addHeader("Access-Control-Allow-Headers", "Content-Type");
 
-
             // OPTIONS? Return with a '200' response -- some browsers send this before an actual
             // request to get header contents.
             if (request.getMethod() == "OPTIONS")
@@ -66,7 +49,8 @@ class RequestHandler extends AbstractHandler {
             def context = [
                     'request'  : request,
                     'response' : response,
-                    'query'    : request.getQueryString() != null ? URLDecoder.decode(request.getQueryString(), "UTF-8") : null,
+                    'query'    : request.getQueryString() != null
+                            ? URLDecoder.decode(request.getQueryString(), "UTF-8") : null,
                     'session'  : request.getSession().getId(),
                     'status'   : 200,
                     'hit_time' : System.currentTimeMillis()
