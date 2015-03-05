@@ -1,7 +1,6 @@
 package net.aufdemrand.webizen.sockets
 
 import net.aufdemrand.webizen.web.SocketHandler
-import java.lang.ref.WeakReference
 
 
 class Socket {
@@ -9,7 +8,8 @@ class Socket {
     static def sessions = [:]
 
     static SocketHandler get(String id) {
-        return (sessions.get(id) as WeakReference).get() as SocketHandler
+        sessions.entrySet();
+        return sessions.get(id) as SocketHandler
     }
 
     static boolean isAlive(String id) {

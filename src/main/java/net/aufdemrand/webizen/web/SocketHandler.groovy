@@ -22,9 +22,10 @@ public class SocketHandler extends WebSocketAdapter
         // validating?
         if (message.startsWith('val')) {
             def context = [
+                    'handler' : this,
                     'session' : session,
                     'time'    : System.currentTimeMillis(),
-                    'id'      : message.substring(3),
+                    'id'      : message.substring(4),
                     'flags'   : flags
             ]
             Result r = Hooks.invoke('on socket validation', context)
@@ -32,19 +33,19 @@ public class SocketHandler extends WebSocketAdapter
                 session.getRemote().sendString("log Validation denied.")
                 return
             }
-            Socket.sessions[message.substring(3)] = new WeakReference(this);
-            flags['id'] = message.substring(3);
-            session.getRemote().sendString("log Validated ${message.substring(3)}.")
-
+            Socket.sessions[message.substring(4)] = this;
+            flags['id'] = message.substring(4);
+            session.getRemote().sendString("log Validated ${message.substring(4)}.")
             return
         }
         // make sure validated
         if (flags['id'] == null) {
             session.getRemote().sendString("log Not validated.")
             def context = [
+                    'handler' : this,
                     'session' : session,
                     'time'    : System.currentTimeMillis(),
-                    'id'      : message.substring(3),
+                    'id'      : message.substring(4),
                     'flags'   : flags
             ]
             Hooks.invoke('on socket not validated error', context)
@@ -53,9 +54,10 @@ public class SocketHandler extends WebSocketAdapter
         // else, rely on hooks to perform actions
         def command = message.split('\\s', 2)
         def context = [
+                'handler' : this,
                 'session' : session,
                 'time'    : System.currentTimeMillis(),
-                'id'      : message.substring(3),
+                'id'      : message.substring(4),
                 'flags'   : flags,
                 'command' : command[0],
                 'args'    : command[1]
@@ -72,6 +74,7 @@ public class SocketHandler extends WebSocketAdapter
         Socket.sessions.remove(flags['id'])
         // invoke hook for socket closed
         def context = [
+                'handler' : this,
                 'session' : session,
                 'time'    : System.currentTimeMillis(),
                 'id'      : flags['id'],
