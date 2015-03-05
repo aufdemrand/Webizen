@@ -15,7 +15,7 @@ class Include {
     //
 
     public static List<Include> getAll() {
-        return CouchHandler.couch.getAll('includes', '').getAs(Include.class);
+        return CouchHandler.couch.getAll('includes', 'include_docs=true').getAs(Include.class);
     }
 
     public static Include get(def id) {

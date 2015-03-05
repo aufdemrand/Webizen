@@ -31,7 +31,7 @@ abstract class Script {
     }
 
     public static List<Script> getAll() {
-        return CouchHandler.couch.getAll('scripts', '').getAs(WebScript.class);
+        return CouchHandler.couch.getAll('scripts', 'include_docs=true').getAs(WebScript.class);
     }
 
     public static reloadAll() {
@@ -52,9 +52,12 @@ abstract class Script {
     // To be implemented by the specific script class for the type
     public abstract load();
 
+    // To be implemented by the specific script class for the type
+    public abstract unload();
+
     // Saves any changes to the Database
     public Operation save()   {
-        Result r = Hooks.invoke('on script save', [ 'id' : _id ] );
+        Result r = Hooks.invoke('on script save', [ 'id' : _id ]);
         return CouchHandler.couch.updateDoc(this, 'scripts')
     }
 
