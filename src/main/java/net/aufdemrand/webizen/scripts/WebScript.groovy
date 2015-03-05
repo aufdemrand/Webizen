@@ -19,18 +19,28 @@ class WebScript extends Script {
         return d;
     }
 
+    public unload() {
+        // Make sure it's hooked already before firing unload
+        if (!Hooks.isHooked(_id as String)) return;
+        Result r = Hooks.invoke('on script unload', [ 'id' : _id, 'hook' : hook, 'script' : this ]);
+        // Unload any existing hooks
+        Hooks.remove(_id);
+    }
+
     public load() {
 
         if (contents == null)
             return;
 
-        // Unload any existing hooks
-        Hooks.remove(_id);
+        // First, unload if already loaded
+        unload()
 
         GroovyShell compiler = new GroovyShell()
 
+        // Server code is parsed first
         String html = (contents['server'] as String);
 
+        // Utilizing layout?
         if (contents['layout'] != null && (contents['layout'] as String).trim().length() > 0)
             html +=
                 '\ncontext.response.getWriter().println("""' +
@@ -38,13 +48,24 @@ class WebScript extends Script {
                 .replaceAll('(?i)<head>', '<head>')
                 .replaceAll('(?i)</body>', '</body>') + '\n""")'
 
+        // Design requires usage of layout (needs <head> tag to position itself)
         html = StringUtils.replace(html, '<head>',
                 '<head><style>' + (contents['design'] != null ? contents['design'] + '</style>' : '<head>'))
 
+        // As well as client-side (needs </body> tag to position itself)
         html = StringUtils.replace(html, '</body>',
                 (contents['client'] != null ? contents['client'] : '') + '</body>')
 
-        try { s = compiler.parse(Preprocessor.process(html as String)); } catch (Exception e) { e.printStackTrace(); print html }
+        try {
+            s = compiler.parse(Preprocessor.process(html as String));
+        } catch (Exception e) {
+            e.printStackTrace()
+            StringWriter sw = new StringWriter()
+            PrintWriter pw = new PrintWriter(sw)
+            e.printStackTrace(pw)
+            Result r = Hooks.invoke('on script compile error', [ 'id' : _id, 'error' : e, 'stack_trace' : pw.toString() ])
+            if (r.cancelled) return;
+        }
 
         closure = {
             Result r ->
@@ -53,13 +74,17 @@ class WebScript extends Script {
                     StringWriter sw = new StringWriter()
                     PrintWriter pw = new PrintWriter(sw)
                     e.printStackTrace(pw)
-                    try { r.context['response'].getWriter().println('<server-error>' + sw.toString() + '</server-error>') } catch (Exception ex) { e.printStackTrace() }
+                    try { r.context['response'].getWriter().println('<server-error>' + sw.toString() + '</server-error>') }
+                    catch (Exception ex) { e.printStackTrace() }
                 }
         }
 
         // Register new hook
         if (hook != null)
             Hooks.add(hook, _id, closure);
+
+        // Hook for loading -- makes loading more hooks inside scripts easier
+        Result r = Hooks.invoke('on script load', [ 'id' : _id, 'hook' : hook, 'script' : this ]);
     }
 
 }
