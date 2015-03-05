@@ -1,5 +1,6 @@
 package net.aufdemrand.webizen.hooks
 
+
 class Hooks {
 
     //
@@ -24,7 +25,6 @@ class Hooks {
             for( Iterator<Map.Entry<String, Closure>> it = hks.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry<String, Closure> entry = it.next()
                 if(entry.getKey().equals(id)) {
-                    println 'SCRIPT REMOVE -> ' + id
                     it.remove()
                 }
             }
@@ -43,4 +43,17 @@ class Hooks {
         return result;
     }
 
+    public static boolean isHooked(String id) {
+        for (Map<String, Closure> hks in hooks.values()) {
+            for( Iterator<Map.Entry<String, Closure>> it = hks.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<String, Closure> entry = it.next()
+                if(entry.getKey().equals(id)) {
+                    // found the id, return true -- this id is already hooked
+                    return true;
+                }
+            }
+        }
+        // nothing found?
+        return false;
+    }
 }
