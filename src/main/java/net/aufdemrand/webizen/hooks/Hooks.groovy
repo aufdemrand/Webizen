@@ -18,6 +18,7 @@ class Hooks {
 
         // Add hook to the list
         hooks[hook.toLowerCase()][id.toLowerCase()] = closure;
+        println('HOOK ADDED -> ' + id)
     }
 
     public static void remove(String id) {
@@ -25,6 +26,7 @@ class Hooks {
             for( Iterator<Map.Entry<String, Closure>> it = hks.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry<String, Closure> entry = it.next()
                 if(entry.getKey().equals(id)) {
+                    println('HOOK REMOVED -> ' + id)
                     it.remove()
                 }
             }

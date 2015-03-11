@@ -84,7 +84,8 @@ class WebScript extends Script {
             Hooks.add(hook, _id, closure);
 
         // Hook for loading -- makes loading more hooks inside scripts easier
-        Result r = Hooks.invoke('on script load', [ 'id' : _id, 'hook' : hook, 'script' : this ]);
+        Hooks.invoke('on script load', [ 'id' : _id, 'hook' : hook, 'script' : this ]);
+        Hooks.invoke('on script ' + _id + ' load', [ 'id' : _id, 'hook' : hook, 'script' : this ]);
     }
 
 }
