@@ -49,17 +49,17 @@ class CouchHandler {
      */
     public <T> T getDoc(String id, String database, Class type)  {
 
-        def returned = RequestCreator.get(address + database + '/' + id)
+        // Make a HTTP Request to the Couch Database, use the response which contains the document
+        // contents (except attachments)
+        def returned = RequestCreator.get( (address + database + '/' + id) as String )
 
-        // ObjectMapper for Jackson Deserialization
+        // Turn the JSON response into an Object of given 'type'
         ObjectMapper objectMapper = new ObjectMapper()
         objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-
-        // Fetch document from the return string
         try {
             def doc = objectMapper.readValue(returned, type)
             if (doc._id == null) return null;
-            else return doc
+            else return (T) doc;
         } catch (Exception e) { e.printStackTrace(); return null }
     }
 
@@ -71,7 +71,7 @@ class CouchHandler {
         // URL to fetch information from CouchDB
         def url = URIUtil.encodePath(address + database + '/' + id + '/' + attachment)
 
-        // Client for making HTTP GET requests
+        // Client for making HTTP GET requests -> TODO: Use RequestCreator
         CloseableHttpClient httpClient = HttpClients.createDefault()
         HttpGet httpGet = new HttpGet(url)
         CloseableHttpResponse response = null
@@ -85,7 +85,6 @@ class CouchHandler {
             HttpEntity entity = response.getEntity()
             returned = [ 'content_type' : entity.getContentType().value,
                          'content_length' : entity.getContentLength() ]
-            println('ATTACHMENT [' + response.getStatusLine().statusCode + '] -> ' + entity.getContentType().value + ' .. ' + entity.getContentLength())
             entity.writeTo(o)
             EntityUtils.consume(entity)
         } catch (Exception e) { e.printStackTrace() } finally {
@@ -118,7 +117,7 @@ class CouchHandler {
             response = httpClient.execute(httpPut);
             HttpEntity entity = response.getEntity();
             returned = IOUtils.toString(entity.getContent());
-            print('ADD [' + response.getStatusLine().statusCode + '] -> ' + returned);
+            print('PUT [' + response.getStatusLine().statusCode + '] -> ' + returned);
             EntityUtils.consume(entity);
         } catch (Exception e) { e.printStackTrace(); } finally {
             if (response != null) try { response.close(); } catch (IOException e) { e.printStackTrace(); }
@@ -221,27 +220,8 @@ class CouchHandler {
      */
     public View getView(String document_id, String view_id, String database, String parameters)  {
 
-        // URL to fetch information from CouchDB
-        def url = URIUtil.encodePath(address + database + '/_design/' + document_id + '/_view/' + view_id) + '?' + parameters
-
-        // Client for making HTTP GET requests
-        CloseableHttpClient httpClient = HttpClients.createDefault()
-        HttpGet httpGet = new HttpGet(url)
-        CloseableHttpResponse response = null
-
-        // Returned string
-        def returned
-
-        // Execute request
-        try {
-            response = httpClient.execute(httpGet)
-            HttpEntity entity = response.getEntity()
-            returned = IOUtils.toString(entity.getContent())
-            EntityUtils.consume(entity)
-            print('VIEW [' + response.getStatusLine().statusCode + '] -> ' + returned)
-        } catch (Exception e) { return null } finally {
-            if (response != null) try { response.close() } catch (IOException e) { e.printStackTrace() }
-        }
+        def returned = RequestCreator.get(
+                (address + database + '/_design/' + document_id + '/_view/' + view_id + '?' + parameters) as String, [ encode: false ] )
 
         // ObjectMapper for Jackson Deserialization
         ObjectMapper objectMapper = new ObjectMapper()
@@ -261,29 +241,7 @@ class CouchHandler {
      */
     public View getAll(String database, String parameters)  {
 
-        // URL to fetch information from CouchDB
-        def url = URIUtil.encodePath(address + database + '/_all_docs') + '?' + parameters
-
-        // print(url)
-
-        // Client for making HTTP GET requests
-        CloseableHttpClient httpClient = HttpClients.createDefault()
-        HttpGet httpGet = new HttpGet(url)
-        CloseableHttpResponse response = null
-
-        // Returned string
-        def returned
-
-        // Execute request
-        try {
-            response = httpClient.execute(httpGet)
-            HttpEntity entity = response.getEntity()
-            returned = IOUtils.toString(entity.getContent())
-            EntityUtils.consume(entity)
-            print('ALL_DOCS [' + response.getStatusLine().statusCode + '] -> ' + returned)
-        } catch (Exception e) { return null } finally {
-            if (response != null) try { response.close() } catch (IOException e) { e.printStackTrace() }
-        }
+        def returned = RequestCreator.get( (address + database + '/_all_docs' + '?' + parameters) as String, [ encode: false ] )
 
         // ObjectMapper for Jackson Deserialization
         ObjectMapper objectMapper = new ObjectMapper()

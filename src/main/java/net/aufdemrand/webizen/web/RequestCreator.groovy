@@ -14,9 +14,9 @@ import org.eclipse.jetty.util.URIUtil
 
 class RequestCreator {
 
-    public static String get(String url) {
+    public static String get(String url, Map options = null) {
         // URL to fetch information from CouchDB
-        url = URIUtil.encodePath(url)
+        if (options?.get('encode') == true) url = URIUtil.encodePath(url)
         // Client for making HTTP GET requests
         CloseableHttpClient httpClient = HttpClients.createDefault()
         HttpGet httpGet = new HttpGet(url)
@@ -29,7 +29,7 @@ class RequestCreator {
             HttpEntity entity = response.getEntity()
             returned = IOUtils.toString(entity.getContent())
             EntityUtils.consume(entity)
-            print('GET [' + response.getStatusLine().statusCode + '] -> ' + returned)
+            println 'GET [' + response.getStatusLine().statusCode + '] -> ' + url
         } catch (Exception e) { return null } finally {
             if (response != null) try { response.close() } catch (IOException e) { e.printStackTrace() }
         }
@@ -55,7 +55,7 @@ class RequestCreator {
             HttpEntity entity = response.getEntity()
             returned = IOUtils.toString(entity.getContent())
             EntityUtils.consume(entity)
-            println('POST [' + response.getStatusLine().statusCode + '] -> ' + returned)
+            println('POST [' + response.getStatusLine().statusCode + '] -> ' + url)
         } catch (Exception e) { return null } finally {
             if (response != null) try { response.close() } catch (IOException e) { e.printStackTrace() }
         }
