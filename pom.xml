@@ -27,6 +27,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.grooscript</groupId>
+            <artifactId>grooscript</artifactId>
+            <version>1.0.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.yaml</groupId>
             <artifactId>snakeyaml</artifactId>
             <version>1.15</version>

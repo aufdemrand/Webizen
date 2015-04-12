@@ -20,7 +20,8 @@ test:
             <html>
                 <head>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-                    
+                    <script src="http://cdn.rawgit.com/chiquitinxx/grooscript/master/src/main/resources/META-INF/resources/grooscript.min.js"></script>
+                    <script src="http://cdn.rawgit.com/chiquitinxx/grooscript/master/src/main/resources/META-INF/resources/grooscript-tools.js"></script>
                     <script src="/js/us-phone-number.js"></script>
                     <title> Test! </title>
                 </head>

@@ -96,10 +96,13 @@ Phone Number:
   handler-meta:
 
     'on-attached':
-        type: 'javascript'
+        type: 'grooscript'
         code: |
-            if (this.textContent == '')
-                this.render();
+            def el = this;
+            if (el.textContent == '') { 
+                el.render();
+              }
+              
 
 
     'on-created':
@@ -121,9 +124,14 @@ Phone Number:
 
 
     'on-attribute-created':
-        type: 'javascript'
+        type: 'grooscript'
         code: |
-            console.log('attribute created!');
+            int x = 1
+            def m = ['test':'testing']
+            console.log(m)
+            $('body').css('background-color','red')
+            console.log("attribute created! ${x}")
+            g$('body').css('background', 'red')
 
 
     'on-attribute-removed':
@@ -132,18 +140,18 @@ Phone Number:
             console.log('attribute removed!');
 
     'on-document-ready':
-        type: 'javascript'
+        type: 'grooscript'
         code: |
-            $('body').on('click', 'us-phone-number', function() {
+            $('body').on('click', 'us-phone-number', {
                 if (!$(this).hasClass('focused')) {
-                    $(this).addClass('focused');
+                    $(this).addClass('focused')
                     $(this).html('<input type=text value="' + $(this).attr('data') + '">')
-                    $(this).find('input').focus();
+                    $(this).find('input').focus()
                 }
-            });
+            })
 
-            $('body').on('blur', 'us-phone-number>input', function() {
-                $(this).parent().attr('data', $(this).val());
-                $(this).parent()[0].render();
-                $(this).parent().removeClass('focused');
+            $('body').on('blur', 'us-phone-number>input', {
+                $(this).parent().attr('data', $(this).val())
+                $(this).parent()[0].render()
+                $(this).parent().removeClass('focused')
             });

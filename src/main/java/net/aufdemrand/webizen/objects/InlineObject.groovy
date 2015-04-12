@@ -3,6 +3,7 @@ package net.aufdemrand.webizen.objects
 import groovy.json.JsonBuilder
 import net.aufdemrand.webizen.hooks.Hooks
 import net.aufdemrand.webizen.hooks.Result
+import org.grooscript.GrooScript
 
 /**
  * Created by Jeremy on 3/22/2015.
@@ -26,6 +27,22 @@ class InlineObject {
 
         // For removal
         loaded_meta.add(meta)
+
+        // Compile grooscript
+        for (def entry in meta['handler-meta'].entrySet()) {
+            def script = entry.getValue()
+            if (script['type'] == 'grooscript') {
+                def grooscript = """
+                    import org.grooscript.jquery.GQueryImpl;
+                    def g\$ = new GQueryImpl();
+                    """
+                println 'Compiling grooscript';
+                grooscript += script['code']
+                meta['handler-meta'][entry.getKey()]['code'] = GrooScript.convert(grooscript);
+                println meta['handler-meta'][entry.getKey()]['code']
+            }
+
+        }
 
         // Create hook for serving the javascript handler as defined in the
         // 'handler-meta'
