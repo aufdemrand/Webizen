@@ -43,18 +43,25 @@ class RequestHandler extends AbstractHandler {
 
             // OPTIONS? Return with a '200' response -- some browsers send this before an actual
             // request to get header contents.
-            if (request.getMethod() == "OPTIONS")
+            if (request.getMethod() == "OPTIONS") {
+                response.setStatus(200)
                 return;
+            }
 
             def context = [
                     'request'  : request,
                     'response' : response,
+                    'parameters' : request.getParameterMap(),
                     'query'    : request.getQueryString() != null
                             ? URLDecoder.decode(request.getQueryString(), "UTF-8") : null,
                     'session'  : request.getSession().getId(),
                     'status'   : 200,
                     'hit_time' : System.currentTimeMillis()
             ]
+
+            // println request.getParameterMap()
+
+
 
             Hooks.invoke('on page hit', context);
             Hooks.invoke('on ' + target + ' hit', context);

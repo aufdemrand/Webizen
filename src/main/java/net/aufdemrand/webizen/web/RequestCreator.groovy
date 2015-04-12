@@ -29,7 +29,7 @@ class RequestCreator {
             HttpEntity entity = response.getEntity()
             returned = IOUtils.toString(entity.getContent())
             EntityUtils.consume(entity)
-            println 'GET [' + response.getStatusLine().statusCode + '] -> ' + url
+            // println 'GET [' + response.getStatusLine().statusCode + '] -> ' + url
         } catch (Exception e) { return null } finally {
             if (response != null) try { response.close() } catch (IOException e) { e.printStackTrace() }
         }
@@ -55,7 +55,7 @@ class RequestCreator {
             HttpEntity entity = response.getEntity()
             returned = IOUtils.toString(entity.getContent())
             EntityUtils.consume(entity)
-            println('POST [' + response.getStatusLine().statusCode + '] -> ' + url)
+            // println('POST [' + response.getStatusLine().statusCode + '] -> ' + url)
         } catch (Exception e) { return null } finally {
             if (response != null) try { response.close() } catch (IOException e) { e.printStackTrace() }
         }
