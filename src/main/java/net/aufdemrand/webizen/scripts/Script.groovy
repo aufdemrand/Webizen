@@ -14,9 +14,10 @@ import org.codehaus.jackson.map.ObjectMapper
 abstract class Script {
 
     //
-    // Static
+    // Deprecated
     //
 
+    @Deprecated
     public static Script get(def id) {
         Script d = CouchHandler.couch.getDoc(id, 'scripts', WebScript.class);
         if (d == null) {
@@ -26,18 +27,34 @@ abstract class Script {
         return d;
     }
 
+    @Deprecated
     public static boolean exists(def id) {
         return CouchHandler.couch.getDoc(id, 'scripts', WebScript.class) != null;
     }
 
+    @Deprecated
     public static List<Script> getAll() {
         return CouchHandler.couch.getAll('scripts', 'include_docs=true').getAs(WebScript.class);
     }
 
+    @Deprecated
     public static reloadAll() {
         for (Script s in getAll())
             try { s.load() } catch (Exception e) { e.printStackTrace() }
     }
+
+    // Saves any changes to the Database
+    @Deprecated
+    public Operation save()   {
+        Result r = Hooks.invoke('on script save', [ 'id' : _id ]);
+        return CouchHandler.couch.updateDoc(this, 'scripts')
+    }
+
+    // Removes this record from the Database
+    @Deprecated
+    public Operation remove() { return CouchHandler.couch.removeDoc(this, 'scripts') }
+
+
 
     //
     // Instance
@@ -55,15 +72,6 @@ abstract class Script {
     // To be implemented by the specific script class for the type
     public abstract unload();
 
-    // Saves any changes to the Database
-    public Operation save()   {
-        Result r = Hooks.invoke('on script save', [ 'id' : _id ]);
-        return CouchHandler.couch.updateDoc(this, 'scripts')
-    }
-
-    // Removes this record from the Database
-    public Operation remove() { return CouchHandler.couch.removeDoc(this, 'scripts') }
-
     @Override
     public String toString() {
         ObjectMapper mapper = new ObjectMapper();
@@ -78,8 +86,11 @@ abstract class Script {
     // Serialized
     //
 
-    // Documents have an ID and revision (managed by CouchDB)
-    def _id, _rev
+    // Scripts have an ID
+    def _id
+
+    @Deprecated
+    def _rev
 
     // The name of the 'hook' that executes the script
     def hook

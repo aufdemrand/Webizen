@@ -1,6 +1,7 @@
 package net.aufdemrand.webizen.scripts
 
 import net.aufdemrand.webizen.database.CouchHandler
+import net.aufdemrand.webizen.database.Operation
 import net.aufdemrand.webizen.hooks.Hooks
 import net.aufdemrand.webizen.hooks.Result
 import org.apache.commons.lang.StringUtils
@@ -8,7 +9,23 @@ import org.apache.commons.lang.StringUtils
 
 class WebScript extends Script {
 
-    // Web scripts combine a Groovy/HTML/CSS/Javascript stack to provide web page output
+
+
+
+    // Web scripts use the database to store script files.
+
+    public static boolean exists(def id) {
+        return CouchHandler.couch.getDoc(id, 'scripts', WebScript.class) != null;
+    }
+
+    public static List<Script> getAll() {
+        return CouchHandler.couch.getAll('scripts', 'include_docs=true').getAs(WebScript.class);
+    }
+
+    public static reloadAll() {
+        for (Script s in getAll())
+            try { s.load() } catch (Exception e) { e.printStackTrace() }
+    }
 
     public static Script get(def id) {
         Script d = CouchHandler.couch.getDoc(id, 'scripts', WebScript.class);
@@ -87,5 +104,18 @@ class WebScript extends Script {
         Hooks.invoke('on script load', [ 'id' : _id, 'hook' : hook, 'script' : this ]);
         Hooks.invoke('on script ' + _id + ' load', [ 'id' : _id, 'hook' : hook, 'script' : this ]);
     }
+
+    // Saves any changes to the Database
+    public Operation save()   {
+        Result r = Hooks.invoke('on script save', [ 'id' : _id ]);
+        return CouchHandler.couch.updateDoc(this, 'scripts')
+    }
+
+    public Operation remove() {
+        return CouchHandler.couch.removeDoc(this, 'scripts')
+    }
+
+    // Needed for Couch
+    def _rev
 
 }
