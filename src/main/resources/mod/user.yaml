@@ -1,0 +1,48 @@
+User:
+  type: database-object
+  database: users
+  prefix: user'
+
+  # fields are known bits of information about the object that can be manipulated and/or accessed by the outside
+  field-meta:
+
+    'user-name':
+        type: 'text'
+        default: 'unknown user'
+
+    'slack-token':
+        type: 'text'
+
+    'phone-number':
+        type: 'us-phone-number'
+
+    'roles':
+        type: 'array'
+        default:
+            - 'basic user'
+
+
+  function-meta:
+
+    # Standard function when an existing database-object is fetched
+    'fetch':
+      type: groovy
+      code: |
+
+    # Standard function when a new database-object is being requested
+    'create':
+      type: groovy
+      code: | 
+
+
+  rendering-meta:
+
+    'manager':
+        type: 'ghtml'
+        code: |
+
+
+
+
+
+

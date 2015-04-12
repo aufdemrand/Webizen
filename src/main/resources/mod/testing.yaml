@@ -1,0 +1,60 @@
+test:
+  type: hook-script
+  hook: 'on /testing/ hit'
+
+  contents:
+
+    base-logic:
+        order: 1
+        type: groovy
+        code: |
+            def x = 2 + 2;
+            def color = 'cornflowerblue'
+            def color2 = 'whitesmoke'
+
+
+    client-layout:
+        order: 2
+        type: ghtml
+        code: |
+            <html>
+                <head>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+                    
+                    <script src="/js/us-phone-number.js"></script>
+                    <title> Test! </title>
+                </head>
+                <body>
+                    Testing 1, 2, ${ (1 + 2) }, $x!
+                    <us-phone-number data='3'></us-phone-number>
+                </body>
+            </html>
+
+
+    local-style:
+        order: 4
+        insert-after: '<head>'
+        tab: 2
+        type: gcss
+        code: |
+            body {
+                color: ${color}
+            }
+
+
+    client-imports:
+        order: 5
+        insert-after: '<head>'
+        type: ghtml-snippet
+        tab: 2
+        code: |
+            <script src='/ajax/'></script>
+
+
+    client-code:
+        order: 6
+        tab: 1
+        insert-before: '</body>'
+        type: javascript
+        code: |
+            $('body').css('background-color','${color2}');
