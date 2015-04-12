@@ -1,5 +1,6 @@
 package net.aufdemrand.webizen.database
 
+import groovy.json.JsonSlurper
 import net.aufdemrand.webizen.web.RequestCreator
 import org.apache.commons.io.IOUtils
 import org.apache.http.HttpEntity
@@ -43,6 +44,47 @@ class CouchHandler {
     //
     // We can do things with the database!
     //
+
+    public createDatabase(String id) {
+        // URL to add a db (address already has /)
+        def url = URIUtil.encodePath(address + id)
+
+        // Client for making HTTP PUT requests
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPut httpPut = new HttpPut(url);
+        // Needs a valid entity, send along an empty JSON object
+        httpPut.setEntity(new StringEntity('{}'))
+        CloseableHttpResponse response = null;
+
+        // Returned string
+        String returned;
+
+        // Execute request
+        try {
+            response = httpClient.execute(httpPut);
+            HttpEntity entity = response.getEntity();
+            returned = IOUtils.toString(entity.getContent());
+            print('PUT [' + response.getStatusLine().statusCode + '] -> ' + returned);
+            EntityUtils.consume(entity);
+        } catch (Exception e) { e.printStackTrace(); } finally {
+            if (response != null) try { response.close(); } catch (IOException e) { e.printStackTrace(); }
+        }
+
+        // ObjectMapper for Jackson Deserialization
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(
+                DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
+        return objectMapper.readValue(returned, Operation.class);
+    }
+
+
+    public boolean containsDatabase(String id) {
+        def returned = RequestCreator.get( (address + '_all_dbs') as String )
+        def slurper = new JsonSlurper()
+        return slurper.parseText(returned).contains(id)
+    }
+
 
     /**
      * Gets a Document from the Couch Database. Returns null if the document doesn't exist.
