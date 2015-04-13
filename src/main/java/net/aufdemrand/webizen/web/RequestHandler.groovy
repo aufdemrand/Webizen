@@ -59,10 +59,6 @@ class RequestHandler extends AbstractHandler {
                     'hit_time' : System.currentTimeMillis()
             ]
 
-            // println request.getParameterMap()
-
-
-
             Hooks.invoke('on page hit', context);
             Hooks.invoke('on ' + target + ' hit', context);
 

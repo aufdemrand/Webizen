@@ -49,7 +49,7 @@ test:
         type: ghtml-snippet
         tab: 2
         code: |
-            <script src='/ajax/'></script>
+            
 
 
     client-code:

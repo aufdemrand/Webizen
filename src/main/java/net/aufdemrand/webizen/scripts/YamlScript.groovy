@@ -104,7 +104,7 @@ class YamlScript extends Script {
             }
             counter++;
         }
-        print html
+        // print html
 
         try {
             GroovyShell compiler = new GroovyShell()

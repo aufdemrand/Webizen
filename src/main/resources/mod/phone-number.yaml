@@ -131,7 +131,6 @@ Phone Number:
             console.log(m)
             $('body').css('background-color','red')
             console.log("attribute created! ${x}")
-            g$('body').css('background', 'red')
 
 
     'on-attribute-removed':
