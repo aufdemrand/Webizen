@@ -1,7 +1,7 @@
 User:
   type: database-object
   database: users
-  prefix: user'
+  prefix: user
 
   # fields are known bits of information about the object that can be manipulated and/or accessed by the outside
   field-meta:
@@ -17,7 +17,7 @@ User:
         type: 'us-phone-number'
 
     'roles':
-        type: 'array'
+        type: 'list'
         default:
             - 'basic user'
 

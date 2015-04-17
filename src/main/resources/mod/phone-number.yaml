@@ -1,4 +1,5 @@
 Phone Number:
+
   type: inline-object
   # Since inline-objects will eventually be rendered to the client's DOM as a custom element, the prefix
   # must contain a hyphen to comply with W3C Web Component standards. Since custom elements are still considered 
@@ -11,9 +12,9 @@ Phone Number:
   attribute-meta:
 
     'data':
-      type: text
-      include: always
-      desc: 'The raw data provided for parsing the phone number.'
+        type: text
+        include: always
+        desc: 'The raw data provided for parsing the phone number.'
 
 
   # Inline-objects utilize functions to perform various default actions on the object (such as construct), 
@@ -31,9 +32,8 @@ Phone Number:
         code: |
             // store raw data since this object will allow manipulations from the user and we'll
             // supply the user with the original data (pre-parsed) to work with
-            println('incoming data!')
             obj.attribute['data'] = args['data']
-            // parse phone number (from given data)
+            // parse phone number (from data attribute)
             def stripped = ''
             def data = args['data'];
             if (data == null) data = '';
@@ -48,6 +48,7 @@ Phone Number:
             if (stripped.length() > 10) {
                 obj.attribute['extension'] = stripped[10..(stripped.length() - 1)]
             }
+            obj.attribute['tabindex'] = 0
 
 
     # Custom function to validate the phone number.
@@ -62,9 +63,10 @@ Phone Number:
             else 
                 return false;
 
+
     # Custom function to write out a pretty-text version of the phone number
     # that will be used in the rendering methods.
-    'write-out':
+    'pretty-out':
         type: 'groovy'
         code: |
             if (obj.call('is-valid'))
@@ -73,6 +75,7 @@ Phone Number:
               obj.attribute['line-number'] +
               (obj.attribute['extension'] != null ? ' ex. ' + obj.attribute['extension'] : '')
             else return obj.attribute['data']
+
 
 
   # Inline-objects can render data (or results of an action) to the client as ghtml, html with ${groovy-strings},
@@ -84,73 +87,95 @@ Phone Number:
     'standard':
         type: 'ghtml'
         code: |
-            ${obj.call('write-out')}
+            ${ obj.call('pretty-out') }
 
-    'readonly':
-        type: 'ghtml'
+    'focused':
+        type: ghtml
         code: |
-            ${obj.call('write-out')}
-
+            (<input size=3 scope=area-code type=text value="${ obj.attribute['area-code'] }">) 
+            <input size=3 scope=exchange type=text value="${ obj.attribute['exchange'] }">-<input size=4 scope=line-number type=text value="${ obj.attribute['line-number'] }">
+            <span action=ok><svg version="1.2" baseProfile="tiny" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M16.972 6.251c-.967-.538-2.185-.188-2.72.777l-3.713 6.682-2.125-2.125c-.781-.781-2.047-.781-2.828 0-.781.781-.781 2.047 0 2.828l4 4c.378.379.888.587 1.414.587l.277-.02c.621-.087 1.166-.46 1.471-1.009l5-9c.537-.966.189-2.183-.776-2.72z"/></svg>
+            </span>
 
 
   handler-meta:
 
-    'on-attached':
-        type: 'grooscript'
-        code: |
-            def el = this;
-            if (el.textContent == '') { 
-                el.render();
-              }
-              
-
-
     'on-created':
-        type: 'javascript'
-        code: |
-            console.log('created!');
-
-
-    'on-detached':
-        type: 'javascript'
-        code: |
-            console.log('detached!');
-
-
-    'on-attribute-changed':
-        type: 'javascript'
-        code: |
-            console.log('attribute changed!');
-
-
-    'on-attribute-created':
         type: 'grooscript'
         code: |
-            int x = 1
-            def m = ['test':'testing']
-            console.log(m)
-            $('body').css('background-color','red')
-            console.log("attribute created! ${x}")
+            this.render();
 
-
-    'on-attribute-removed':
-        type: 'javascript'
-        code: |
-            console.log('attribute removed!');
 
     'on-document-ready':
         type: 'grooscript'
         code: |
             $('body').on('click', 'us-phone-number', {
-                if (!$(this).hasClass('focused')) {
-                    $(this).addClass('focused')
-                    $(this).html('<input type=text value="' + $(this).attr('data') + '">')
-                    $(this).find('input').focus()
+                def obj = this;
+                // If not already focused, call render('focused')
+                if (this.getState() != 'focused') {
+                    this.render('focused').then( {
+                        $(obj).find('input')[0].focus()
+                    });
                 }
-            })
+            });
 
             $('body').on('blur', 'us-phone-number>input', {
-                $(this).parent().attr('data', $(this).val())
-                $(this).parent()[0].render()
-                $(this).parent().removeClass('focused')
+                $(this).parent().attr('data',$(this).parent().text())
+                $(this).parent()[0].render('standard')
             });
+
+
+
+  style-meta:
+
+    'default':
+        type: gcss
+        code: |
+            us-phone-number {
+                min-width: 200px;
+                height: 34px;
+                font-family: 'Nova Mono';
+                font-weight: 600;
+                background-color: whitesmoke;
+                display: inline-block;
+                padding-top: 1px;
+                padding-left: 15px;
+                padding-right: 15px;
+                border: 1px solid darkgray;
+                border-bottom: 2px solid darkgray;
+                border-radius: 2px;
+            }
+
+
+            us-phone-number>[scope] {
+                font-family: 'Nova Mono';
+                font-weight: 600;
+                border: none;
+                background-color: transparent;
+                padding: 7px;
+                padding-top: 5px;
+                padding-left: 5px;
+                padding-right: 0px;
+                display: inline-block;
+                font-size: 17px;
+                top: 0px;
+                outline: none;
+                position: relative;
+            }
+
+            us-phone-number>[action] {
+                display: inline-block;
+                top: 4px;
+                padding-left: 12px;
+                position: relative;
+                float: right;
+            }
+
+            us-phone-number>[action]>svg {
+                fill: dimgray;
+            }
+
+            us-phone-number>[action]>svg:hover {
+                fill: cornflowerblue;
+                cursor: pointer;
+            }

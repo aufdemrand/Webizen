@@ -1,6 +1,6 @@
 test:
   type: hook-script
-  hook: 'on /testing/ hit'
+  hook: 'on /test/form-elements hit'
 
   contents:
 
@@ -9,8 +9,21 @@ test:
         type: groovy
         code: |
             def x = 2 + 2;
-            def color = 'cornflowerblue'
-            def color2 = 'whitesmoke'
+
+
+    client-imports:
+        order: 3
+        insert-after: '<head>'
+        type: ghtml-snippet
+        tab: 2
+        code: |
+            <!-- Essentials -->
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+            <script src="http://cdn.rawgit.com/chiquitinxx/grooscript/master/src/main/resources/META-INF/resources/grooscript.min.js"></script>
+            <link href='http://fonts.googleapis.com/css?family=Nova+Mono' rel='stylesheet' type='text/css'>
+            <!-- Form-Elements -->
+            <script src="/us-phone-number/code/"></script>
+            <link rel='stylesheet' href='/us-phone-number/style/default'>
 
 
     client-layout:
@@ -19,43 +32,17 @@ test:
         code: |
             <html>
                 <head>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-                    <script src="http://cdn.rawgit.com/chiquitinxx/grooscript/master/src/main/resources/META-INF/resources/grooscript.min.js"></script>
-                    <script src="http://cdn.rawgit.com/chiquitinxx/grooscript/master/src/main/resources/META-INF/resources/grooscript-tools.js"></script>
-                    <script src="/js/us-phone-number.js"></script>
                     <title> Test! </title>
                 </head>
+
                 <body>
-                    Testing 1, 2, ${ (1 + 2) }, $x!
-                    <us-phone-number data='3'></us-phone-number>
+
+                    <h1>Phone number input</h1>
+                    <div>
+                        <div>Standard</div>
+                        <us-phone-number data='4196694427' state='focused'></us-phone-number> with text
+                    </div>
                 </body>
+
             </html>
 
-
-    local-style:
-        order: 4
-        insert-after: '<head>'
-        tab: 2
-        type: gcss
-        code: |
-            body {
-                color: ${color}
-            }
-
-
-    client-imports:
-        order: 5
-        insert-after: '<head>'
-        type: ghtml-snippet
-        tab: 2
-        code: |
-            
-
-
-    client-code:
-        order: 6
-        tab: 1
-        insert-before: '</body>'
-        type: javascript
-        code: |
-            $('body').css('background-color','${color2}');
