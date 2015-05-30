@@ -1,13 +1,11 @@
 package net.aufdemrand.webizen
 
 import net.aufdemrand.webizen.database.CouchHandler
-import net.aufdemrand.webizen.objects.Encryptor
-import net.aufdemrand.webizen.objects.InlineObject
+import net.aufdemrand.webizen.web.Encryptor
 import net.aufdemrand.webizen.objects.Objects
 import net.aufdemrand.webizen.scripts.WebScript
 import net.aufdemrand.webizen.scripts.YamlScript
 import net.aufdemrand.webizen.web.Server
-import net.aufdemrand.webizen.scripts.Script
 import org.apache.commons.io.FilenameUtils
 
 import java.nio.file.FileSystems
@@ -24,7 +22,7 @@ class Webizen {
     public static main(String[] args) throws Exception {
 
         // Initialize the Database
-        new CouchHandler('http://68.70.176.226:5984/')
+        new CouchHandler('http://localhost:5984/')
 
         // Initialize Objects
         Objects.loadObjectDefinitions()
@@ -37,7 +35,7 @@ class Webizen {
         Runnable r = new Runnable() {
             @Override
             void run() {
-                Path folder = Paths.get("C:\\Users\\Jeremy\\Documents\\shuttle\\src\\main\\resources\\mod");
+                Path folder = Paths.get("C:\\Users\\Administrator\\Google Drive\\Modules\\dev");
                 WatchService watchService = FileSystems.getDefault().newWatchService();
                 folder.register(watchService,
                         StandardWatchEventKinds.ENTRY_CREATE,
@@ -64,7 +62,8 @@ class Webizen {
                         if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
                             String fileName = event.context().toString();
                             println("File modified:" + fileName);
-                            if (FilenameUtils.getExtension(fileName) == 'yaml')
+                            if (FilenameUtils.getExtension(fileName) == 'yaml'
+                                || FilenameUtils.getExtension(fileName) == 'groovy')
                                 Objects.loadObjectDefinitions()
                                 YamlScript.loadYamlScripts()
                         }	}

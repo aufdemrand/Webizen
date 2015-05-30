@@ -2,6 +2,7 @@ package net.aufdemrand.webizen.web
 
 import org.eclipse.jetty.server.handler.ContextHandler
 import org.eclipse.jetty.server.handler.HandlerCollection
+import org.eclipse.jetty.server.handler.ResourceHandler
 import org.eclipse.jetty.server.session.HashSessionIdManager
 import org.eclipse.jetty.server.session.HashSessionManager
 import org.eclipse.jetty.server.session.SessionHandler
@@ -46,18 +47,27 @@ class Server implements Runnable {
         // Handlers we will use
         HandlerCollection handlers = new HandlerCollection()
 
-        // SocketHandler
+        // Socket handler
         ContextHandler sockets = new ContextHandler()
-        sockets.setContextPath("/sockets")
+        sockets.setContextPath("/sockets/*")
         sockets.setHandler(sessions)
         sessions.setHandler(new SocketFactory())
         handlers.addHandler(sessions)
 
-        // Standard scripts handler
+        // Static files handler
+        ContextHandler resources = new ContextHandler()
+        resources.setContextPath("/static/*")
+        ResourceHandler resourceHandler = new ResourceHandler()
+        resourceHandler.setResourceBase("C:\\Users\\Administrator\\Google Drive\\Modules\\static")
+        resources.setHandler(resourceHandler)
+        handlers.addHandler(resources)
+
+        // Scripts handler
         ContextHandler scripts = new ContextHandler()
         scripts.setContextPath("/")
         scripts.setHandler(new RequestHandler())
         handlers.addHandler(scripts)
+
 
         server.setHandler(handlers)
 

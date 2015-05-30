@@ -8,6 +8,10 @@ public class SocketFactory extends WebSocketHandler
     @Override
     public void configure(WebSocketServletFactory factory)
     {
-        factory.register(SocketHandler.class);
+        factory.getPolicy().setIdleTimeout(300000)
+        factory.register(SocketHandler.class)
     }
+
+
+
 }

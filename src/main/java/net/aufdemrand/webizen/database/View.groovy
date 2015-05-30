@@ -12,11 +12,11 @@ class View {
     // Static
     //
 
-    public static View getView(String document_id, String view_id, String database) {
+    public static View get(String document_id, String view_id, String database) {
         return CouchHandler.couch.getView(document_id, view_id, database, '')
     }
 
-    public static View getView(String document_id, String view_id, String database, String parameters) {
+    public static View get(String document_id, String view_id, String database, String parameters) {
         return CouchHandler.couch.getView(document_id, view_id, database, parameters)
     }
 

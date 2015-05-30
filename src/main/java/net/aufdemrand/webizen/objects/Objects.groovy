@@ -17,7 +17,7 @@ class Objects {
             InlineObject.deinitialize(meta)
 
         // TODO: Change scope of this variable
-        def myDirectoryPath = 'C:\\Users\\Jeremy\\Documents\\shuttle\\src\\main\\resources\\mod'
+        def myDirectoryPath = "C:\\Users\\Administrator\\Google Drive\\Modules\\dev"
 
         println 'Scanning for objects.'
         File dir = new File(myDirectoryPath);
@@ -27,17 +27,20 @@ class Objects {
                 Yaml yaml = new Yaml()
                 Map<String, Object> obj = yaml.load(child.getText())
                 // Loop through definitions inside the YAML file.
+                if (obj != null)
                 for (def definition in obj.keySet()) {
-                    // Store in definitions if of the appropriate types
-                    if (obj[definition]['type'] == 'database-object'
-                            || obj[definition]['type'] == 'inline-object') {
-                        println '--> New object found: ' + obj[definition]['prefix']
-                        definitions[obj[definition]['prefix']] = obj[definition];
-                    }
-                    // Run the returned meta through the initializer to do any
-                    // pre-compilation or whatever.
-                    if (obj[definition]['type'] == 'inline-object')
-                        InlineObject.initialize(obj[definition]);
+                    try {
+                        // Store in definitions if of the appropriate types
+                        if (obj[definition]['type'] == 'database-object'
+                                || obj[definition]['type'] == 'inline-object') {
+                            println '--> New object found: ' + obj[definition]['prefix']
+                            definitions[obj[definition]['prefix']] = obj[definition];
+                        }
+                        // Run the returned meta through the initializer to do any
+                        // pre-compilation or whatever.
+                        if (obj[definition]['type'] == 'inline-object')
+                            InlineObject.initialize(obj[definition]);
+                    } catch (Exception e) { e.printStackTrace() }
                 }
             }
 
@@ -53,10 +56,10 @@ class Objects {
     }
 
     // Need a new object? Just give the type and args and this will get you one.
-    public def static newObject(String id, Map args) {
+    public def static newObject(String id, Map args, def context) {
         def meta = definitions[id];
         if (meta["type"] == 'inline-object')
-            return new InlineObject(meta, args);
+            return new InlineObject(meta, args, context);
     }
 
 }

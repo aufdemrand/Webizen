@@ -3,8 +3,10 @@ package net.aufdemrand.webizen.scripts
 import net.aufdemrand.webizen.database.CouchHandler
 import net.aufdemrand.webizen.hooks.Hooks
 import net.aufdemrand.webizen.hooks.Result
+import net.aufdemrand.webizen.objects.InlineObject
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.lang.StringUtils
+import org.grooscript.GrooScript
 import org.yaml.snakeyaml.Yaml
 
 
@@ -18,7 +20,7 @@ class YamlScript extends Script {
         for (YamlScript s in scripts.values())
             s.unload();
 
-        def myDirectoryPath = 'C:\\Users\\Jeremy\\Documents\\shuttle\\src\\main\\resources\\mod'
+        def myDirectoryPath = "C:\\Users\\Administrator\\Google Drive\\Modules\\dev"
 
         File dir = new File(myDirectoryPath);
         File[] directoryListing = dir.listFiles();
@@ -80,7 +82,7 @@ class YamlScript extends Script {
 
                     // format code depending on type
                     if (section['type'] == 'ghtml') {
-                        code = '\ncontext.response.getWriter().println("""' + code + '""")\n'
+                        code = InlineObject.DEFAULT_IMPORTS + '\ncontext.response.getWriter().println("""' + code + '""")\n'
                     } else if (section['type'] == 'ghtml-snippet') {
                         // code = 'code + '""")\n'
                     } else if (section['type'] == 'gcss') {
@@ -88,7 +90,14 @@ class YamlScript extends Script {
                     } else if (section['type'] == 'javascript') {
                         code = '\n<script>' +
                                 StringUtils.replace( StringUtils.replace(code, '$(', '\\$('), '$.', '\\$.') +'</script>\n'
+                    } else if (section['type'] == 'grooscript') {
+                        code = '\n<script>' +
+                                StringUtils.replace( GrooScript.convert( code ), '"$"', '"\\$"') +'</script>\n'
+                    } else if (section['type'] == 'groovy') {
+                        code = InlineObject.DEFAULT_IMPORTS + code;
                     }
+
+                    // println code
 
                     // 'insert-after string' strategy, or just append to end
                     if (section['insert-after'] != null) {
@@ -138,4 +147,8 @@ class YamlScript extends Script {
         Hooks.invoke('on script ' + _id + ' load', [ 'id' : _id, 'hook' : hook, 'script' : this ]);
     }
 
+
+
 }
+
+

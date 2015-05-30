@@ -1,4 +1,4 @@
-package net.aufdemrand.webizen.objects
+package net.aufdemrand.webizen.web
 
 import org.apache.commons.lang.RandomStringUtils
 import javax.crypto.Cipher
