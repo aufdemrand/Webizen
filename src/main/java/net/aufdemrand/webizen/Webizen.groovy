@@ -1,6 +1,7 @@
 package net.aufdemrand.webizen
 
 import net.aufdemrand.webizen.database.CouchHandler
+import net.aufdemrand.webizen.includes.Include
 import net.aufdemrand.webizen.web.Encryptor
 import net.aufdemrand.webizen.objects.Objects
 import net.aufdemrand.webizen.scripts.WebScript
@@ -19,18 +20,22 @@ import java.nio.file.WatchService;
 
 class Webizen {
 
+    public static def include_path = "C:\\Users\\Administrator\\Google Drive\\Modules\\src"
+
     public static main(String[] args) throws Exception {
 
         // Initialize the Database
         new CouchHandler('http://localhost:5984/')
 
         // Initialize Objects
-        Objects.loadObjectDefinitions()
+        // Objects.loadObjectDefinitions()
         Encryptor.init()
 
+        Include.scan()
+
         // Initialize Scripts
-        YamlScript.loadYamlScripts()
-        WebScript.reloadAll()
+        // YamlScript.loadYamlScripts()
+        // WebScript.reloadAll()
 
         Runnable r = new Runnable() {
             @Override

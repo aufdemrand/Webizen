@@ -35,13 +35,23 @@ class Hooks {
 
     public static Result invoke(String id, def context) {
         println 'HOOK INVOKE -> ' + id
-        Result result = new Result(context);
+        def result;
+        // Check result-type
+        if (context['result-type'] instanceof Class) {
+            if (Result.class.isAssignableFrom(context.type as Class)) {
+                result = (context.type as Class).getConstructor(Object.class).newInstance(context)
+            }
+        }
+        // But default to standard Result
+        if (result == null)
+            result = new Result(context);
+        // Initiate hooks that match the id
         if (hooks.containsKey(id.toLowerCase()))
             try {
                 for (Closure c in hooks[id.toLowerCase()].values())
                     try { c.call(result) } catch (Exception e) { e.printStackTrace() }
             } catch (Exception e) { e.printStackTrace() }
-
+        // Return mutated result
         return result;
     }
 

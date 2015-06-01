@@ -1,6 +1,7 @@
 package net.aufdemrand.webizen.web
 
 import net.aufdemrand.webizen.hooks.Hooks
+import net.aufdemrand.webizen.hooks.HttpResult
 import org.eclipse.jetty.server.Request
 import org.eclipse.jetty.server.handler.AbstractHandler
 
@@ -49,24 +50,28 @@ class RequestHandler extends AbstractHandler {
             }
 
             def context = [
+                    // intended to be immutable
                     'request'  : request,
                     'response' : response,
-                    'parameters' : request.getParameterMap(),
-                    'query'    : request.getQueryString() != null
-                            ? URLDecoder.decode(request.getQueryString(), "UTF-8") : null,
                     'session'  : request.getSession().getId(),
+                    'hit-time' : System.currentTimeMillis(),
+                    // intended to be mutable
+                    'content-type' : "text/html;charset=utf-8",
                     'status'   : 200,
-                    'hit_time' : System.currentTimeMillis()
+                    // Specify subclass of result type (helper methods)
+                    'result-type': HttpResult.class
             ]
 
-            Hooks.invoke('on page hit', context);
-            Hooks.invoke('on ' + target + ' hit', context);
+            Hooks.invoke('on page hit', context)
+            Hooks.invoke('on ' + target + ' hit', context)
+
+            // Use Result to set status (default 200), contentType, etc.
+            // Anything more complex should alter the response itself,
+            // for example -- Headers/etc.
+            response.setStatus(context['status'] as Integer)
+            response.setContentType(context['content-type'] as String)
 
         } catch (Exception e) { e.printStackTrace(); response.setStatus(501); }
-
-        // Set defaults if not handled by script
-        if (response.contentType == null) response.setContentType("text/html;charset=utf-8");
-        if (response.status == null) response.setStatus(HttpServletResponse.SC_OK);
 
     }
 
