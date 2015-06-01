@@ -38,8 +38,8 @@ class Hooks {
         def result;
         // Check result-type
         if (context['result-type'] instanceof Class) {
-            if (Result.class.isAssignableFrom(context.type as Class)) {
-                result = (context.type as Class).getConstructor(Object.class).newInstance(context)
+            if (Result.class.isAssignableFrom(context['result-type'] as Class)) {
+                result = (context['result-type'] as Class).getConstructor(Object.class).newInstance(context)
             }
         }
         // But default to standard Result

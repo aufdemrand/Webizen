@@ -40,7 +40,7 @@ class Webizen {
         Runnable r = new Runnable() {
             @Override
             void run() {
-                Path folder = Paths.get("C:\\Users\\Administrator\\Google Drive\\Modules\\dev");
+                Path folder = Paths.get(Webizen.include_path);
                 WatchService watchService = FileSystems.getDefault().newWatchService();
                 folder.register(watchService,
                         StandardWatchEventKinds.ENTRY_CREATE,
@@ -67,11 +67,10 @@ class Webizen {
                         if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
                             String fileName = event.context().toString();
                             println("File modified:" + fileName);
-                            if (FilenameUtils.getExtension(fileName) == 'yaml'
-                                || FilenameUtils.getExtension(fileName) == 'groovy')
-                                Objects.loadObjectDefinitions()
-                                YamlScript.loadYamlScripts()
-                        }	}
+                            Include.scan()
+                        }
+                    }
+
                     valid = watchKey.reset();
                 }
             }
