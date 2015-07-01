@@ -1,4 +1,4 @@
-package net.aufdemrand.webizen.hooks
+package net.aufdemrand.webizen.hooks.types
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

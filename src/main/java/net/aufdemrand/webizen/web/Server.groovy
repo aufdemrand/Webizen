@@ -1,21 +1,18 @@
 package net.aufdemrand.webizen.web
 
+import net.aufdemrand.webizen.Webizen
 import org.eclipse.jetty.server.handler.ContextHandler
 import org.eclipse.jetty.server.handler.HandlerCollection
-import org.eclipse.jetty.server.handler.ResourceHandler
 import org.eclipse.jetty.server.session.HashSessionIdManager
 import org.eclipse.jetty.server.session.HashSessionManager
 import org.eclipse.jetty.server.session.SessionHandler
+import org.eclipse.jetty.servlet.DefaultServlet
 import org.eclipse.jetty.servlet.ServletContextHandler
 import org.eclipse.jetty.servlet.ServletHolder
-import org.eclipse.jetty.websocket.WebSocketHandler
-import org.eclipse.jetty.websocket.server.WebSocketHandler
-import org.eclipse.jetty.websocket.servlet.WebSocketServlet
-import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory
 
-/**
- * Created by Jeremy on 1/15/2015.
- */
+import javax.servlet.DispatcherType
+
+
 class Server implements Runnable {
 
 
@@ -54,12 +51,15 @@ class Server implements Runnable {
         sessions.setHandler(new SocketFactory())
         handlers.addHandler(sessions)
 
-        // Static files handler
-        ContextHandler resources = new ContextHandler()
-        resources.setContextPath("/static/*")
-        ResourceHandler resourceHandler = new ResourceHandler()
-        resourceHandler.setResourceBase("C:\\Users\\Administrator\\Google Drive\\Modules\\static")
-        resources.setHandler(resourceHandler)
+        // Static files handler (DefaultServlet allows file modification/filters)
+        ServletContextHandler resources = new ServletContextHandler()
+        resources.setResourceBase(Webizen.static_path)
+        resources.setContextPath('/static/*')
+        resources.addFilter(GrooscriptFilter.class, "*.groovy", EnumSet.of(DispatcherType.REQUEST))
+        DefaultServlet resourceServlet = new DefaultServlet();
+        ServletHolder servletHolder = new ServletHolder(resourceServlet);
+        servletHolder.setInitParameter('useFileMappedBuffer', 'false');
+        resources.addServlet(servletHolder, '/')
         handlers.addHandler(resources)
 
         // Scripts handler
@@ -81,4 +81,9 @@ class Server implements Runnable {
     }
 
 
+
 }
+
+
+
+

@@ -1,5 +1,7 @@
 package net.aufdemrand.webizen.web
 
+import net.aufdemrand.webizen.client.Client
+import net.aufdemrand.webizen.client.ClientRegistry
 import net.aufdemrand.webizen.hooks.Hooks
 import net.aufdemrand.webizen.hooks.HttpResult
 import org.eclipse.jetty.server.Request
@@ -53,7 +55,7 @@ class RequestHandler extends AbstractHandler {
                     // intended to be immutable
                     'request'  : request,
                     'response' : response,
-                    'session'  : request.getSession().getId(),
+                    'client'   : ClientRegistry.getClient(request.getSession().getId()),
                     'hit-time' : System.currentTimeMillis(),
                     // intended to be mutable
                     'content-type' : "text/html;charset=utf-8",

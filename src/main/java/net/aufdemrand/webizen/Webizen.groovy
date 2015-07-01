@@ -1,82 +1,39 @@
 package net.aufdemrand.webizen
 
 import net.aufdemrand.webizen.database.CouchHandler
+import net.aufdemrand.webizen.hooks.types.AnnotatedHook
 import net.aufdemrand.webizen.includes.Include
 import net.aufdemrand.webizen.web.Encryptor
-import net.aufdemrand.webizen.objects.Objects
-import net.aufdemrand.webizen.scripts.WebScript
-import net.aufdemrand.webizen.scripts.YamlScript
 import net.aufdemrand.webizen.web.Server
-import org.apache.commons.io.FilenameUtils
-
-import java.nio.file.FileSystems
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.StandardWatchEventKinds
-import java.nio.file.WatchEvent
-import java.nio.file.WatchKey
-import java.nio.file.WatchService;
+import org.apache.log4j.BasicConfigurator
+import org.apache.log4j.Level
+import org.apache.log4j.LogManager
+import org.apache.log4j.Logger
 
 
 class Webizen {
 
-    public static def include_path = "C:\\Users\\Administrator\\Google Drive\\Modules\\src"
+    public static def include_path = "C:\\Users\\Jeremy\\Documents\\Shuttle\\Includes"
+    public static def static_path  = "C:\\Users\\Jeremy\\Documents\\Shuttle\\Static"
 
     public static main(String[] args) throws Exception {
 
         // Initialize the Database
-        new CouchHandler('http://localhost:5984/')
+        new CouchHandler('http://68.70.176.226:5984/')
 
         // Initialize Objects
         // Objects.loadObjectDefinitions()
-        Encryptor.init()
 
-        Include.scan()
-
-        // Initialize Scripts
-        // YamlScript.loadYamlScripts()
-        // WebScript.reloadAll()
-
-        Runnable r = new Runnable() {
-            @Override
-            void run() {
-                Path folder = Paths.get(Webizen.include_path);
-                WatchService watchService = FileSystems.getDefault().newWatchService();
-                folder.register(watchService,
-                        StandardWatchEventKinds.ENTRY_CREATE,
-                        StandardWatchEventKinds.ENTRY_DELETE,
-                        StandardWatchEventKinds.ENTRY_MODIFY);
-
-                boolean valid = true;
-                while (valid) {
-                    WatchKey watchKey = watchService.take();
-                    for (WatchEvent event : watchKey.pollEvents()) {
-                        WatchEvent.Kind kind = event.kind();
-                        if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
-                            String fileName = event.context().toString();
-                            println("File Created:" + fileName);
-                            //YamlScript.loadYamlScripts()
-                        }
-
-                        if (StandardWatchEventKinds.ENTRY_DELETE.equals(event.kind())) {
-                            String fileName = event.context().toString();
-                            println("File deleted:" + fileName);
-                            //YamlScript.loadYamlScripts()
-                        }
-
-                        if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
-                            String fileName = event.context().toString();
-                            println("File modified:" + fileName);
-                            Include.scan()
-                        }
-                    }
-
-                    valid = watchKey.reset();
-                }
-            }
+        BasicConfigurator.configure();
+        List<Logger> loggers = Collections.<Logger>list(LogManager.getCurrentLoggers());
+        loggers.add(LogManager.getRootLogger());
+        for ( Logger logger : loggers ) {
+            logger.setLevel(Level.INFO);
         }
 
-        new Thread(r).start()
+        Encryptor.init()
+        Include.initialize()
+        AnnotatedHook.getStaticHooks()
 
         // Start the Web Server
         Server web_server = new Server(10000, 'http://127.0.0.1')

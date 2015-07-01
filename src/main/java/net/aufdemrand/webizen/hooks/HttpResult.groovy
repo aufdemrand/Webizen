@@ -1,5 +1,7 @@
 package net.aufdemrand.webizen.hooks
 
+import net.aufdemrand.webizen.client.Client
+
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -12,22 +14,21 @@ class HttpResult extends Result {
 
     def context = [:]
 
-    public HttpServletRequest request = {
-        return context['request']
-    } as HttpServletRequest
+    public HttpServletRequest getRequest() {
+        return context['request'] as HttpServletRequest
+    }
 
-    public HttpServletResponse response = {
-        return context['response']
-    } as HttpServletResponse
+    public HttpServletResponse getResponse() {
+        return context['response'] as HttpServletResponse
+    }
 
-    public String session_id = {
-        return request.getSession().getId()
-    } as String
+    public Client getClient() {
+        return context['client'] as Client
+    }
 
-    public Long hit_time = {
-        return context['hit_time']
-
-    } as Long
+    public Long getHitTime() {
+        return context['hit_time'] as Long
+    }
 
     HttpResult(Object context) {
         super(context)
